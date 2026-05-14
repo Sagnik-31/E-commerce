@@ -1,0 +1,167 @@
+// ==========================================
+//  controllers.js — Login Logic (Brain of Auth)
+// ==========================================
+//
+//  WHAT THIS FILE DOES:
+//  → Contains the actual login logic
+//  → Receives email & password from frontend
+//  → Checks if user exists in database
+//  → Compares password using bcrypt
+//  → Returns a JWT token on success
+//
+//  FLOW:
+//  Frontend sends { email, password }
+//     ↓
+//  Controller receives it
+//     ↓
+//  Finds user in MongoDB by email
+//     ↓
+//  Compares password with hashed password
+//     ↓
+//  If match → creates JWT token → sends back to frontend
+//  If no match → sends error message
+//
+
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("./models"); // our User model
+
+// ──────────────────────────────────────────
+//  POST /api/auth/login
+// ──────────────────────────────────────────
+const loginUser = async (req, res) => {
+  try {
+    console.log("📩 Login request received");
+    console.log("   Body:", JSON.stringify({ email: req.body.email, password: "***" }));
+
+    // Step 1: Get email & password from request body
+    const { email, password } = req.body;
+
+    // Step 2: Check if both fields were provided
+    if (!email || !password) {
+      console.log("❌ Missing fields — email:", !!email, "password:", !!password);
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
+    }
+
+    // Step 3: Find the user in database by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      console.log("❌ No user found with email:", email);
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+    console.log("✅ User found:", user.name, "(", user.email, ")");
+
+    // Step 4: Compare the password
+    // bcrypt.compare() checks if the plain password matches the hashed one
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log("🔑 Password match:", isMatch);
+
+    if (!isMatch) {
+      console.log("❌ Password does not match for:", email);
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    // Step 5: Create a JWT token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    console.log("✅ Login successful! Token generated for:", user.email);
+
+    // Step 6: Send success response back to frontend
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      token: token,
+    });
+  } catch (error) {
+    console.error("❌ Login Error:", error.message);
+    res.status(500).json({
+      message: "Server error. Please try again.",
+    });
+  }
+};
+
+// ──────────────────────────────────────────
+//  POST /api/auth/register (bonus — for creating users)
+// ──────────────────────────────────────────
+const registerUser = async (req, res) => {
+  try {
+    console.log("📩 Register request received");
+    console.log("   Body:", JSON.stringify(req.body));
+
+    const { name, email, password } = req.body;
+
+    // Check if all fields provided
+    if (!name || !email || !password) {
+      console.log("❌ Missing fields — name:", !!name, "email:", !!email, "password:", !!password);
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      console.log("⚠️  User already exists:", email);
+      return res.status(400).json({
+        message: "User already exists with this email",
+      });
+    }
+
+    // Hash the password before saving
+    // genSalt(10) → creates a random string to mix with password
+    // hash() → converts plain password into unreadable hash
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    console.log("🔒 Password hashed successfully");
+
+    // Create user in database
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    console.log("✅ User saved to MongoDB!");
+    console.log("   ID:", user._id);
+    console.log("   Name:", user.name);
+    console.log("   Email:", user.email);
+
+    // Create token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(201).json({
+      message: "Registration successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      token: token,
+    });
+  } catch (error) {
+    console.error("❌ Register Error:", error.message);
+    res.status(500).json({
+      message: "Server error. Please try again.",
+    });
+  }
+};
+
+module.exports = { loginUser, registerUser };

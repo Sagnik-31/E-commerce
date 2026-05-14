@@ -1,0 +1,28 @@
+// ==========================================
+//  routes.js — API Route Definitions
+// ==========================================
+//
+//  WHAT THIS FILE DOES:
+//  → Maps URL paths to controller functions
+//  → When frontend sends a request to a URL,
+//    Express checks this file to know which
+//    function should handle it
+//
+//  ROUTES:
+//  POST /api/auth/login    → loginUser()
+//  POST /api/auth/register → registerUser()
+//
+
+const express = require("express");
+const { loginUser, registerUser } = require("./controllers");
+
+// Create a router (a mini-app that handles specific routes)
+const router = express.Router();
+
+// When frontend sends POST to /api/auth/login → run loginUser
+router.post("/login", loginUser);
+
+// When frontend sends POST to /api/auth/register → run registerUser
+router.post("/register", registerUser);
+
+module.exports = router;

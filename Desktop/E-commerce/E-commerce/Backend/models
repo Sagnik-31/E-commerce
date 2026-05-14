@@ -1,0 +1,52 @@
+// ==========================================
+//  models.js — User Schema (Database Structure)
+// ==========================================
+//
+//  WHAT THIS FILE DOES:
+//  → Defines what a "User" looks like in our database
+//  → Think of it as a blueprint/template for user data
+//
+//  WHAT GETS STORED:
+//  → name     — user's full name
+//  → email    — user's email (must be unique)
+//  → password — hashed password (NEVER store plain text!)
+//
+//  HOW MONGOOSE WORKS:
+//  1. We define a "schema" (structure)
+//  2. We create a "model" from that schema
+//  3. The model lets us create, find, update, delete users
+//
+
+const mongoose = require("mongoose");
+
+// Define the User Schema — this is the structure of each user document
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+      trim: true, // removes extra spaces
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true, // no two users can have same email
+      lowercase: true, // auto-converts to lowercase
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters"],
+    },
+  },
+  {
+    timestamps: true, // auto-adds createdAt and updatedAt fields
+  }
+);
+
+// Create and export the User model
+// "User" → name of the collection in MongoDB (becomes "users")
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;

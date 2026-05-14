@@ -1,0 +1,35 @@
+// ==========================================
+//  config.js — MongoDB Database Connection
+// ==========================================
+//
+//  WHAT THIS FILE DOES:
+//  → Connects our Express server to MongoDB
+//  → Uses mongoose (a library) to talk to MongoDB
+//  → Reads the connection URL from .env file
+//
+//  HOW IT WORKS:
+//  1. We import mongoose
+//  2. We create a function that connects to MongoDB
+//  3. If connection succeeds → log success
+//  4. If connection fails → log error and stop the server
+//
+
+const mongoose = require("mongoose");
+
+const connectDB = async () => {
+  try {
+    // mongoose.connect() tries to connect to MongoDB
+    // process.env.MONGO_URI reads the URL from .env file
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`   Database: ${conn.connection.name}`);
+    console.log(`   URI: ${process.env.MONGO_URI}`);
+  } catch (error) {
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    // Exit the process if we can't connect to database
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
