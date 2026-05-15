@@ -32,7 +32,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/login");
   };
 
   const handleSearch = (query) => {
@@ -120,7 +120,7 @@ const Navbar = () => {
             Logout
           </button>
         ) : (
-          <Link to="/" className="nav-link nav-btn-primary">
+          <Link to="/login" className="nav-link nav-btn-primary">
             Login
           </Link>
         )}

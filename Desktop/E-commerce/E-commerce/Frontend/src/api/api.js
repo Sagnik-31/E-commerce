@@ -31,4 +31,20 @@ export const loginUser = async (formData) => {
   return await API.post("/login", formData);
 };
 
+// ── Password Reset API Calls ────────────────
+// Step 1: Send OTP to user's email
+export const forgotPassword = async (data) => {
+  return await API.post("/forgot-password", data);
+};
+
+// Step 2: Verify the OTP
+export const verifyOtp = async (data) => {
+  return await API.post("/verify-otp", data);
+};
+
+// Step 3: Reset password with new password
+export const resetPassword = async (data) => {
+  return await API.post("/reset-password", data);
+};
+
 export default API;

@@ -12,8 +12,9 @@ import "./styles/global.css";
 const Layout = () => {
   const location = useLocation();
 
-  // Hide Navbar on Login and Signup pages
-  const hideNavbar = location.pathname === "/" || location.pathname === "/signup";
+  // Hide Navbar on Landing, Login, Signup, and password reset pages
+  const hideNavbarPaths = ["/", "/login", "/signup", "/forgot-password", "/verify-otp", "/reset-password"];
+  const hideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
     <>

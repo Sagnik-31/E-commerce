@@ -67,7 +67,7 @@ const Signup = () => {
         type: "success",
       });
 
-      setTimeout(() => navigate("/"), 1000);
+      setTimeout(() => navigate("/login"), 1000);
 
     } catch (error) {
       console.error("Signup error:", error.response?.data || error.message);
@@ -128,11 +128,15 @@ const Signup = () => {
         />
 
         <button type="submit" className="login-button">
-          Sign Up
+          Create account →
         </button>
 
         <p className="login-footer-text">
-          Already have an account? <Link to="/" className="login-link">Login</Link>
+          Already have an account? <Link to="/login" className="login-link">Login</Link>
+        </p>
+
+        <p className="login-footer-text">
+          <Link to="/" className="login-link">← Back to Home</Link>
         </p>
       </form>
     </div>

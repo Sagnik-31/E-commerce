@@ -3,6 +3,7 @@ import { loginUser } from "../api/api";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/Login.css";
+import "../styles/ForgotPassword.css";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -93,12 +94,20 @@ const Login = () => {
           className="login-input"
         />
 
+        <Link to="/forgot-password" className="forgot-link">
+          Forgot Password?
+        </Link>
+
         <button type="submit" className="login-button">
-          Login
+          Log in →
         </button>
 
         <p className="login-footer-text">
           Don&apos;t have an account? <Link to="/signup" className="login-link">Sign Up</Link>
+        </p>
+
+        <p className="login-footer-text">
+          <Link to="/" className="login-link">← Back to Home</Link>
         </p>
       </form>
     </div>
